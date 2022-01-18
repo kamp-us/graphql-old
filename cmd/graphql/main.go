@@ -8,27 +8,10 @@ import (
 	"github.com/graph-gophers/graphql-go"
 	"github.com/kamp-us/graphql/internal/handler"
 	"github.com/kamp-us/graphql/internal/loader"
+	"github.com/kamp-us/graphql/internal/resolver"
 	"github.com/kamp-us/graphql/internal/schema"
 	"go.uber.org/zap"
 )
-
-type QueryResolver struct {
-}
-
-type PingResponse struct {
-	message string
-}
-
-func (r *PingResponse) Message() *string {
-	return &r.message
-}
-
-func (q *QueryResolver) Ping() (*PingResponse, error) {
-	pong := "pong"
-	return &PingResponse{
-		message: pong,
-	}, nil
-}
 
 func main() {
 	var (
@@ -47,8 +30,13 @@ func main() {
 		log.Fatalf("reading embedded schema contents: %s", err)
 	}
 
+	root, err := resolver.NewRoot()
+	if err != nil {
+		log.Fatalf("creating root resolver: %s", err)
+	}
+
 	h := handler.GraphQL{
-		Schema:  graphql.MustParseSchema(s, &QueryResolver{}),
+		Schema:  graphql.MustParseSchema(s, root),
 		Loaders: loader.Initialize(nil),
 	}
 
