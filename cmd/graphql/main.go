@@ -8,15 +8,26 @@ import (
 	"github.com/graph-gophers/graphql-go"
 	"github.com/kamp-us/graphql/internal/handler"
 	"github.com/kamp-us/graphql/internal/loader"
+	"github.com/kamp-us/graphql/internal/schema"
 	"go.uber.org/zap"
 )
 
 type QueryResolver struct {
 }
 
-func (q *QueryResolver) Ping() (*string, error) {
+type PingResponse struct {
+	message string
+}
+
+func (r *PingResponse) Message() *string {
+	return &r.message
+}
+
+func (q *QueryResolver) Ping() (*PingResponse, error) {
 	pong := "pong"
-	return &pong, nil
+	return &PingResponse{
+		message: pong,
+	}, nil
 }
 
 func main() {
@@ -31,18 +42,13 @@ func main() {
 
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 
-	s := graphql.MustParseSchema(`
-		schema {
-			query: Query
-		}
-
-		type Query {
-			ping: String
-		}
-	`, &QueryResolver{})
+	s, err := schema.String()
+	if err != nil {
+		log.Fatalf("reading embedded schema contents: %s", err)
+	}
 
 	h := handler.GraphQL{
-		Schema:  s,
+		Schema:  graphql.MustParseSchema(s, &QueryResolver{}),
 		Loaders: loader.Initialize(nil),
 	}
 
