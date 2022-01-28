@@ -1,5 +1,6 @@
 # The Query type represents all of the entry points into the API.
 type Query {
+  course(id: ID, slug: String): Course
   # Ping server
   ping: Ping
 }

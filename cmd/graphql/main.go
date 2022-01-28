@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/graph-gophers/graphql-go"
+	"github.com/kamp-us/graphql/internal/clients"
 	"github.com/kamp-us/graphql/internal/handler"
 	"github.com/kamp-us/graphql/internal/loader"
 	"github.com/kamp-us/graphql/internal/resolver"
@@ -30,7 +31,12 @@ func main() {
 		log.Fatalf("reading embedded schema contents: %s", err)
 	}
 
-	root, err := resolver.NewRoot()
+	c, err := clients.NewClients()
+	if err != nil {
+		log.Fatalf("initializing clients: %s", err)
+	}
+
+	root, err := resolver.NewRoot(c)
 	if err != nil {
 		log.Fatalf("creating root resolver: %s", err)
 	}

@@ -1,0 +1,17 @@
+# Course represents a course.
+type Course {
+  id: ID!
+  # owner's id
+  userID: ID!
+  # course name
+  name: String!
+  # course description
+  description: String!
+  # course slug
+  slug: String!
+}
+
+# type CourseInput {
+#   id: ID
+#   slug: String
+# }
